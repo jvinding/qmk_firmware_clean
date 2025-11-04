@@ -220,114 +220,57 @@ static const RGB layer_colors[] = {
     [_FUN] = {RGB_ORANGE},
 };
 
-// Helper function to get layer color
-static RGB get_layer_color(uint8_t layer) {
-    if (layer < sizeof(layer_colors) / sizeof(layer_colors[0])) {
-        return layer_colors[layer];
-    }
-    return (RGB){RGB_WHITE}; // Default color
+// Initialize RGB matrix on startup - disable everything
+void keyboard_post_init_user(void) {
+    // Force RGB matrix mode to NONE (0) - must enable first then set mode
+    rgb_matrix_enable_noeeprom();
+    // Set mode to 0 (NONE) - but mode_eeprom_helper clamps < 1 to 1, so we need to set it directly
+    // Actually, let's just disable all effects by setting a solid color mode and then override
+    rgb_matrix_mode_noeeprom(1); // Set to first effect (will be overridden by indicators)
+
+    // Wait a bit for split connection to establish
+    wait_ms(100);
 }
 
-// Helper function to get target layer from a keycode
-static int8_t get_layer_for_keycode(uint16_t keycode) {
-    // Check for layer-tap keys (LT)
-    if (IS_QK_LAYER_TAP(keycode)) {
-        return QK_LAYER_TAP_GET_LAYER(keycode);
-    }
-
-    // Check for tap dance keys that activate layers
-    if (IS_QK_TAP_DANCE(keycode)) {
-        uint8_t td_index = QK_TAP_DANCE_GET_INDEX(keycode);
-        switch (td_index) {
-            case TD_BASE: return _BASE;
-            case TD_EXTRA: return _EXTRA;
-            case TD_TAP: return _TAP;
-            case TD_NAV: return _NAV;
-            case TD_NUM: return _NUM;
-            case TD_MOUSE: return _MOUSE;
-            case TD_SYM: return _SYM;
-            case TD_MEDIA: return _MEDIA;
-            case TD_FUN: return _FUN;
-            case TD_BOOT: return -1; // Boot doesn't activate a layer
-            default: return -1;
-        }
-    }
-
-    return -1; // Keycode doesn't activate a layer
+// Disable advanced indicators completely
+bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    return false;  // Do nothing
 }
 
-// Helper function to resolve keycode through layers (handles KC_TRNS)
-static uint16_t resolve_keycode(keypos_t keypos, layer_state_t state) {
-    // Check layers from highest to lowest
-    for (int8_t layer = 31; layer >= 0; layer--) {
-        if (!(state & (1UL << layer))) {
-            continue; // Layer not active
-        }
-        uint16_t keycode = keymap_key_to_keycode(layer, keypos);
-        if (keycode != KC_TRNS && keycode != KC_NO) {
-            return keycode;
-        }
-    }
-    // Check default layer
-    for (int8_t layer = 31; layer >= 0; layer--) {
-        if (!(default_layer_state & (1UL << layer))) {
-            continue;
-        }
-        uint16_t keycode = keymap_key_to_keycode(layer, keypos);
-        if (keycode != KC_TRNS && keycode != KC_NO) {
-            return keycode;
-        }
-    }
-    return KC_NO;
-}
-
-// Set RGB colors based on layers
+// THE ONLY PLACE WE SET RGB COLORS - in indicators (runs every frame after effects)
+// This ensures colors persist even when RGB_MATRIX_NONE clears them
 bool rgb_matrix_indicators_user(void) {
-    layer_state_t combined_state = layer_state | default_layer_state;
-    uint8_t current_layer = get_highest_layer(combined_state);
-
-    // Iterate through all matrix positions
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            uint8_t led_index = g_led_config.matrix_co[row][col];
-
-            // Skip if no LED at this position
-            if (led_index == NO_LED) {
-                continue;
-            }
-
-            // Resolve keycode through layers (handles KC_TRNS)
-            keypos_t keypos = {.row = row, .col = col};
-            uint16_t keycode = resolve_keycode(keypos, combined_state);
-
-            // If keycode is KC_NO, set to off
-            if (keycode == KC_NO) {
-                rgb_matrix_set_color(led_index, 0, 0, 0);
-                continue;
-            }
-
-            // Check if keycode activates a layer
-            int8_t target_layer = get_layer_for_keycode(keycode);
-            if (target_layer >= 0) {
-                // Key activates a layer, show that layer's color
-                RGB color = get_layer_color(target_layer);
-                rgb_matrix_set_color(led_index, color.r, color.g, color.b);
-            } else {
-                // Key doesn't activate a layer, show current layer's color
-                RGB color = get_layer_color(current_layer);
-                rgb_matrix_set_color(led_index, color.r, color.g, color.b);
-            }
-        }
+    // Only set colors if RGB matrix is enabled and we're on master side
+    if (!rgb_matrix_is_enabled() || !is_keyboard_master()) {
+        return false;
     }
 
-    return false;
+    // Get current layer state directly (not from a cached variable)
+    layer_state_t state = layer_state;
+    uint8_t layer;
+
+    // Check if we're on base layer (state = 0 or state = 1 means base)
+    if (state == 0 || state == 1) {
+        layer = _BASE;
+    } else {
+        // Get the highest active layer (0-indexed, directly matches our enum)
+        layer = get_highest_layer(state);
+    }
+
+    // Get layer color with bounds check
+    RGB color = layer_colors[_BASE]; // Default to white
+    if (layer < sizeof(layer_colors) / sizeof(layer_colors[0])) {
+        color = layer_colors[layer];
+    }
+
+    // Set all LEDs to layer color (this overrides any effect)
+    rgb_matrix_set_color_all(color.r, color.g, color.b);
+
+    return false;  // Don't let other indicators run
 }
 
-// Set underglow color based on active layer
+// No-op layer_state_set_user - we don't need to track layer changes
 layer_state_t layer_state_set_user(layer_state_t state) {
-    uint8_t active_layer = get_highest_layer(state | default_layer_state);
-    RGB color = get_layer_color(active_layer);
-    rgb_matrix_set_color_all(color.r, color.g, color.b);
     return state;
 }
 #endif // RGB_MATRIX_ENABLE
