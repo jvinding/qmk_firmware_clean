@@ -1,8 +1,7 @@
 #pragma once
 
 // Tapping configuration
-#define TAPPING_TERM 250
-#define HOLD_ON_OTHER_KEY_PRESS
+#define TAPPING_TERM 225
 #define CHORDAL_HOLD
 
 // Split keyboard settings
