@@ -1,7 +1,8 @@
 #pragma once
 
 // Tapping configuration
-#define TAPPING_TERM 225
+#define TAPPING_TERM 250
+#define HOLD_ON_OTHER_KEY_PRESS
 #define CHORDAL_HOLD
 
 // Split keyboard settings
@@ -13,4 +14,9 @@
 // Disable features we don't need
 #define NO_ACTION_ONESHOT
 #define NO_MUSIC_MODE
+
+// Enable RGB Matrix
+#ifdef RGB_MATRIX_ENABLE
+#    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_SOLID_COLOR
+#endif
 

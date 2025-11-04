@@ -204,6 +204,134 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+#ifdef RGB_MATRIX_ENABLE
+// Layer color definitions
+static const RGB layer_colors[] = {
+    [_BASE] = {RGB_WHITE},
+    [_EXTRA] = {RGB_RED},
+    [_TAP] = {RGB_SPRINGGREEN},
+    [_BUTTON] = {RGB_PINK},
+    [_NAV] = {RGB_CYAN},
+    [_MOUSE] = {RGB_YELLOW},
+    [_MEDIA] = {RGB_PURPLE},
+    [_NUM] = {RGB_BLUE},
+    [_NUMPAD] = {RGB_TURQUOISE},
+    [_SYM] = {RGB_GREEN},
+    [_FUN] = {RGB_ORANGE},
+};
+
+// Helper function to get layer color
+static RGB get_layer_color(uint8_t layer) {
+    if (layer < sizeof(layer_colors) / sizeof(layer_colors[0])) {
+        return layer_colors[layer];
+    }
+    return (RGB){RGB_WHITE}; // Default color
+}
+
+// Helper function to get target layer from a keycode
+static int8_t get_layer_for_keycode(uint16_t keycode) {
+    // Check for layer-tap keys (LT)
+    if (IS_QK_LAYER_TAP(keycode)) {
+        return QK_LAYER_TAP_GET_LAYER(keycode);
+    }
+
+    // Check for tap dance keys that activate layers
+    if (IS_QK_TAP_DANCE(keycode)) {
+        uint8_t td_index = QK_TAP_DANCE_GET_INDEX(keycode);
+        switch (td_index) {
+            case TD_BASE: return _BASE;
+            case TD_EXTRA: return _EXTRA;
+            case TD_TAP: return _TAP;
+            case TD_NAV: return _NAV;
+            case TD_NUM: return _NUM;
+            case TD_MOUSE: return _MOUSE;
+            case TD_SYM: return _SYM;
+            case TD_MEDIA: return _MEDIA;
+            case TD_FUN: return _FUN;
+            case TD_BOOT: return -1; // Boot doesn't activate a layer
+            default: return -1;
+        }
+    }
+
+    return -1; // Keycode doesn't activate a layer
+}
+
+// Helper function to resolve keycode through layers (handles KC_TRNS)
+static uint16_t resolve_keycode(keypos_t keypos, layer_state_t state) {
+    // Check layers from highest to lowest
+    for (int8_t layer = 31; layer >= 0; layer--) {
+        if (!(state & (1UL << layer))) {
+            continue; // Layer not active
+        }
+        uint16_t keycode = keymap_key_to_keycode(layer, keypos);
+        if (keycode != KC_TRNS && keycode != KC_NO) {
+            return keycode;
+        }
+    }
+    // Check default layer
+    for (int8_t layer = 31; layer >= 0; layer--) {
+        if (!(default_layer_state & (1UL << layer))) {
+            continue;
+        }
+        uint16_t keycode = keymap_key_to_keycode(layer, keypos);
+        if (keycode != KC_TRNS && keycode != KC_NO) {
+            return keycode;
+        }
+    }
+    return KC_NO;
+}
+
+// Set RGB colors based on layers
+bool rgb_matrix_indicators_user(void) {
+    layer_state_t combined_state = layer_state | default_layer_state;
+    uint8_t current_layer = get_highest_layer(combined_state);
+
+    // Iterate through all matrix positions
+    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+            uint8_t led_index = g_led_config.matrix_co[row][col];
+
+            // Skip if no LED at this position
+            if (led_index == NO_LED) {
+                continue;
+            }
+
+            // Resolve keycode through layers (handles KC_TRNS)
+            keypos_t keypos = {.row = row, .col = col};
+            uint16_t keycode = resolve_keycode(keypos, combined_state);
+
+            // If keycode is KC_NO, set to off
+            if (keycode == KC_NO) {
+                rgb_matrix_set_color(led_index, 0, 0, 0);
+                continue;
+            }
+
+            // Check if keycode activates a layer
+            int8_t target_layer = get_layer_for_keycode(keycode);
+            if (target_layer >= 0) {
+                // Key activates a layer, show that layer's color
+                RGB color = get_layer_color(target_layer);
+                rgb_matrix_set_color(led_index, color.r, color.g, color.b);
+            } else {
+                // Key doesn't activate a layer, show current layer's color
+                RGB color = get_layer_color(current_layer);
+                rgb_matrix_set_color(led_index, color.r, color.g, color.b);
+            }
+        }
+    }
+
+    return false;
+}
+
+// Set underglow color based on active layer
+layer_state_t layer_state_set_user(layer_state_t state) {
+    uint8_t active_layer = get_highest_layer(state | default_layer_state);
+    RGB color = get_layer_color(active_layer);
+    rgb_matrix_set_color_all(color.r, color.g, color.b);
+    return state;
+}
+#endif // RGB_MATRIX_ENABLE
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // BASE layer - Colemak
     [_BASE] = LAYOUT_split_3x6_3(
