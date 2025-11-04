@@ -54,10 +54,14 @@ make controllerworks/mini42:jvinding_mini42_miryoku
 ### Method 2: Using QMK CLI
 
 ```bash
-qmk flash -kb controllerworks/mini42 -km jvinding_mini42_miryoku -bl rp2040
+qmk flash -kb controllerworks/mini42 -km jvinding_mini42_miryoku
 ```
 
-**Note**: Make sure your keyboard is in bootloader mode before running this command.
+**Note**: 
+- The bootloader is automatically detected from the keyboard configuration (RP2040)
+- Make sure your keyboard is in bootloader mode before running this command:
+  - Double-tap the RST button on the PCB
+  - Or hold the BOOTSEL button while plugging in the USB cable
 
 ### Method 3: Manual UF2 Flash
 
