@@ -1,6 +1,6 @@
-# Mini42 Miryoku Keymap
+# City42 Miryoku Keymap
 
-A Miryoku-style keymap for the Controller Works mini42 keyboard, implementing all 11 layers with tap dance layer switching and Mac clipboard shortcuts.
+A Miryoku-style keymap for the Controller Works city42 keyboard, implementing all 11 layers with tap dance layer switching, Mac clipboard shortcuts, and trackpad support.
 
 ## Features
 
@@ -8,6 +8,7 @@ A Miryoku-style keymap for the Controller Works mini42 keyboard, implementing al
 - **Tap Dance**: Double-tap required for layer switching and bootloader access
 - **Mac Clipboard Shortcuts**: Undo, Cut, Copy, Paste, Redo using LGUI modifiers
 - **Mod-Tap Keys**: Dual-function keys with 250ms tapping term
+- **Trackpad Support**: 40mm Cirque Pinnacle trackpad with tap and secondary tap enabled
 
 ## Prerequisites
 
@@ -23,18 +24,18 @@ A Miryoku-style keymap for the Controller Works mini42 keyboard, implementing al
 ### Using QMK CLI
 
 ```bash
-qmk compile -kb controllerworks/mini42 -km jvinding_mini42_miryoku
+qmk compile -kb controllerworks/city42 -km jvinding_city42_miryoku
 ```
 
 The compiled firmware will be located at:
 ```
-qmk_firmware/.build/controllerworks_mini42_jvinding_mini42_miryoku.uf2
+qmk_firmware/.build/controllerworks_city42_jvinding_city42_miryoku.uf2
 ```
 
 ### Using Make (legacy)
 
 ```bash
-make controllerworks/mini42:jvinding_mini42_miryoku
+make controllerworks/city42:jvinding_city42_miryoku
 ```
 
 ## Flashing the Firmware
@@ -53,7 +54,7 @@ make controllerworks/mini42:jvinding_mini42_miryoku
 ### Method 2: Using QMK CLI
 
 ```bash
-qmk flash -kb controllerworks/mini42 -km jvinding_mini42_miryoku
+qmk flash -kb controllerworks/city42 -km jvinding_city42_miryoku
 ```
 
 **Note**: 
@@ -89,6 +90,16 @@ qmk flash -kb controllerworks/mini42 -km jvinding_mini42_miryoku
 - **10 working keys per row** (columns 1-4 on each half)
 - **3 thumb keys per half**
 
+## Trackpad
+
+The city42 includes a 40mm Cirque Pinnacle trackpad that is fully configured and enabled in this keymap. The trackpad supports:
+- Relative mode cursor movement
+- Single tap (primary click)
+- Secondary tap (right click)
+- Smooth cursor tracking
+
+The trackpad is configured via SPI communication and works out of the box with this keymap.
+
 ## Customization
 
 Edit `keymap.c` to modify:
@@ -101,6 +112,7 @@ Edit `config.h` to adjust:
 - Tapping term
 - Hold behavior settings
 - Split keyboard options
+- Trackpad settings (SPI pins, sensitivity, etc.)
 
 ## Troubleshooting
 
@@ -150,9 +162,15 @@ All toolchain checks should pass.
 - Check that all layers are properly defined
 - Ensure tap dance indices match the tap_dance_actions array
 
+### Trackpad Issues
+
+- Verify the pointing device driver is enabled in `rules.mk` (`POINTING_DEVICE_DRIVER = cirque_pinnacle_spi`)
+- Check that SPI pin definitions in `config.h` match the hardware
+- Ensure trackpad is properly connected and powered
+
 ## References
 
 - [QMK Documentation](https://docs.qmk.fm/)
-- [Mini42 Keyboard](https://controller.works/products/mini42-low-profile-ergonomic-keyboard)
+- [City42 Keyboard](https://controller.works/products/city42-ergonomic-keyboard)
 - [Miryoku Layout](https://github.com/manna-harbour/miryoku)
 
