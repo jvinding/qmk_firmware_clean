@@ -11,4 +11,3 @@ CAPS_WORD_INVERT_ON_SHIFT = yes
 # Include additional source files
 SRC += tap_dance.c
 SRC += rgb.c
-
