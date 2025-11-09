@@ -14,6 +14,9 @@
 #define NO_ACTION_ONESHOT
 #define NO_MUSIC_MODE
 
+#define NO_AUTO_SHIFT_ALPHA
+#define AUTO_SHIFT_TIMEOUT 175
+
 // Enable RGB Matrix - disable all effects and animations
 #ifdef RGB_MATRIX_ENABLE
 // #    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_NONE
