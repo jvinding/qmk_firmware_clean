@@ -11,7 +11,7 @@ CAPS_WORD_ENABLE = yes
 AUTO_SHIFT_ENABLE = yes
 
 # Include additional source files from common directory
-SRC += ../../../common/tap_dance.c
-SRC += ../../../common/keymap_common.c
+SRC += ../../../common/jvinding/tap_dance.c
+SRC += ../../../common/jvinding/keymap_common.c
 SRC += rgb.c
 SRC += oled.c

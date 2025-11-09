@@ -14,6 +14,8 @@ void nav_finished(tap_dance_state_t *state, void *user_data);
 void nav_reset(tap_dance_state_t *state, void *user_data);
 void num_finished(tap_dance_state_t *state, void *user_data);
 void num_reset(tap_dance_state_t *state, void *user_data);
+void numpad_finished(tap_dance_state_t *state, void *user_data);
+void numpad_reset(tap_dance_state_t *state, void *user_data);
 void mouse_finished(tap_dance_state_t *state, void *user_data);
 void mouse_reset(tap_dance_state_t *state, void *user_data);
 void sym_finished(tap_dance_state_t *state, void *user_data);
@@ -32,6 +34,7 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_TAP] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, tap_finished, tap_reset),
     [TD_NAV] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, nav_finished, nav_reset),
     [TD_NUM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, num_finished, num_reset),
+    [TD_NUMPAD] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, numpad_finished, numpad_reset),
     [TD_MOUSE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, mouse_finished, mouse_reset),
     [TD_SYM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, sym_finished, sym_reset),
     [TD_MEDIA] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, media_finished, media_reset),

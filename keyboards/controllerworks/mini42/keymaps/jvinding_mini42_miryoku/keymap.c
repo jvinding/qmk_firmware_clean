@@ -1,26 +1,6 @@
 #include QMK_KEYBOARD_H
-#include "keymap_common.h"
-#include "tap_dance.h"
-
-#define U_UNDO LCMD(KC_Z)
-#define U_REDO SCMD(KC_Z)
-#define U_CUT LCMD(KC_X)
-#define U_COPY LCMD(KC_C)
-#define U_PASTE LCMD(KC_V)
-
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    // Intercept CW_TOGG when shift is held and send KC_CAPS instead
-    if (keycode == CW_TOGG && record->event.pressed) {
-        uint8_t mods = get_mods();
-        // Check if only shift (and no other modifiers) is held
-        if ((mods & MOD_MASK_SHIFT) && !(mods & (MOD_MASK_CTRL | MOD_MASK_ALT | MOD_MASK_GUI))) {
-            // Send Caps Lock toggle instead
-            tap_code(KC_CAPS);
-            return false; // Prevent further processing
-        }
-    }
-    return true; // Continue normal processing
-}
+#include "../../../common/keymap_common.h"
+#include "../../../common/tap_dance.h"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // BASE layer - Colemak

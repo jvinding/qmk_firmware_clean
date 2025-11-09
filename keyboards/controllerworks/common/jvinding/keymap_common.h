@@ -30,3 +30,10 @@ enum tap_dance_indices {
     TD_BOOT,
 };
 
+// Macros for common shortcuts
+#define U_UNDO LCMD(KC_Z)
+#define U_REDO SCMD(KC_Z)
+#define U_CUT LCMD(KC_X)
+#define U_COPY LCMD(KC_C)
+#define U_PASTE LCMD(KC_V)
+

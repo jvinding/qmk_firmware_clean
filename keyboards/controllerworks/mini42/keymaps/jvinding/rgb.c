@@ -1,5 +1,5 @@
 #include QMK_KEYBOARD_H
-#include "keymap_common.h"
+#include "../../../common/jvinding/keymap_common.h"
 
 #ifdef RGB_MATRIX_ENABLE
 

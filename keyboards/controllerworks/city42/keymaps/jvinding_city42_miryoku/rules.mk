@@ -10,6 +10,7 @@ CAPS_WORD_ENABLE = yes
 
 AUTO_SHIFT_ENABLE = yes
 
-# Include additional source files
-SRC += tap_dance.c
+# Include additional source files from common directory
+SRC += ../../../common/tap_dance.c
+SRC += ../../../common/keymap_common.c
 SRC += rgb.c

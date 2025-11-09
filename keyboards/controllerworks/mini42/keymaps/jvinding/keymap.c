@@ -1,6 +1,6 @@
 #include QMK_KEYBOARD_H
-#include "../../../common/keymap_common.h"
-#include "../../../common/tap_dance.h"
+#include "../../../common/jvinding/keymap_common.h"
+#include "../../../common/jvinding/tap_dance.h"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // BASE layer - Colemak
