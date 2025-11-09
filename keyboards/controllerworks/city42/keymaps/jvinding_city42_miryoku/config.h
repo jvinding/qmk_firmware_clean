@@ -13,5 +13,7 @@
 // #    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_NONE
 // #    define RGB_MATRIX_DISABLE_KEYCODES  // Disable RGB keycodes to prevent mode changes
 // #    define RGB_MATRIX_DISABLE_TIMEOUT 0  // Disable timeout
-#    define RGB_MATRIX_DISABLE_WHEN_USB_SUSPENDED  // Disable when suspended
+    #define RGB_MATRIX_DISABLE_WHEN_USB_SUSPENDED  // Disable when suspended
+    #define RGB_MATRIX_SLEEP
+    #define RGB_MATRIX_LED_FLUSH_LIMIT 32
 #endif

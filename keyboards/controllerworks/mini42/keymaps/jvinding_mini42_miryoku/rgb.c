@@ -122,8 +122,8 @@ hsv_t layer_colors_hsv[11][54] = {
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     // Define LED ranges for each half (27 LEDs per side, total 54)
-    // const uint8_t LEFT_LED_COUNT = 27;
-    // const uint8_t LEFT_LED_MAX = LEFT_LED_COUNT;
+    const uint8_t LEFT_LED_COUNT = 27;
+    const uint8_t LEFT_LED_MAX = LEFT_LED_COUNT;
     // const uint8_t RIGHT_LED_MIN = LEFT_LED_COUNT;
     // const uint8_t RIGHT_LED_MAX = 54;
 
@@ -131,22 +131,22 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     if (!is_keyboard_master()) {
         return false;
     }
-    // if (is_keyboard_left()) {
-    //     if (led_min > LEFT_LED_MAX) {
-    //         return false;
-    //     }
-    //     if (led_max > LEFT_LED_MAX) {
-    //         led_max = LEFT_LED_MAX;
-    //     }
-    // } else {
-    //     return false;
+    if (is_keyboard_left()) {
+        if (led_min > LEFT_LED_MAX) {
+            return false;
+        }
+        if (led_max > LEFT_LED_MAX) {
+            led_max = LEFT_LED_MAX;
+        }
+    } else {
+        return false;
         // if (led_max < RIGHT_LED_MIN) {
         //     return false;
         // }
         // if (led_min < RIGHT_LED_MIN) {
         //     led_min = RIGHT_LED_MIN;
         // }
-    // }
+    }
 
     uint8_t layer = get_highest_layer(layer_state | default_layer_state);
 

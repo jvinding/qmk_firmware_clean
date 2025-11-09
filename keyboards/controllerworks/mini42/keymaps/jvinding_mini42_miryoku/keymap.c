@@ -8,12 +8,19 @@
 #define U_COPY LCMD(KC_C)
 #define U_PASTE LCMD(KC_V)
 
-const key_override_t capsword_key_override = ko_make_basic(MOD_MASK_SHIFT, CW_TOGG, KC_CAPS);
-
-const key_override_t *key_overrides[] = {
-    &capsword_key_override,
-    NULL
-};
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    // Intercept CW_TOGG when shift is held and send KC_CAPS instead
+    if (keycode == CW_TOGG && record->event.pressed) {
+        uint8_t mods = get_mods();
+        // Check if only shift (and no other modifiers) is held
+        if ((mods & MOD_MASK_SHIFT) && !(mods & (MOD_MASK_CTRL | MOD_MASK_ALT | MOD_MASK_GUI))) {
+            // Send Caps Lock toggle instead
+            tap_code(KC_CAPS);
+            return false; // Prevent further processing
+        }
+    }
+    return true; // Continue normal processing
+}
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // BASE layer - Colemak
